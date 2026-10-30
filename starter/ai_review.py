@@ -15,23 +15,27 @@ import re
 
 def extract_refs(text: str) -> list[str]:
     """Return every invoice reference (INV- followed by exactly 4 digits) in text."""
-    return re.findall(r"INV-[1-9]{4}", text)
+    return re.findall(r"INV-[0-9]{4}(?![0-9])", text)
 
 
-def _visit(graph, account, start, path):
+def _visit(graph, account, start, path, visited):
+    visited.add(account)
     for dest, _ in graph.get(account, []):
         if dest == start:
             path.append(dest)
             return True
+        if dest in visited:
+            continue
         path.append(dest)
-        if _visit(graph, dest, start, path):
+        if _visit(graph, dest, start, path, visited):
             return True
+        path.pop()
     return False
 
 
 def find_round_trip(graph: dict, start: str) -> list[str]:
     """Return [start, ..., start] following wires out of start and back, or []."""
     path = [start]
-    if _visit(graph, start, start, path):
+    if _visit(graph, start, start, path, set()):
         return path
     return []

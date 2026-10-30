@@ -36,3 +36,12 @@ def test_find_round_trip_backtracks_after_dead_end():
 def test_find_round_trip_handles_cycle_not_involving_start():
     graph = {"A": [("B", 100.0)], "B": [("B", 100.0)]}
     assert find_round_trip(graph, "A") == []
+
+
+def test_find_round_trip_continues_after_unrelated_cycle():
+    graph = {
+        "A": [("B", 100.0), ("C", 100.0)],
+        "B": [("B", 100.0)],
+        "C": [("A", 100.0)],
+    }
+    assert find_round_trip(graph, "A") == ["A", "C", "A"]
