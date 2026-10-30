@@ -18,3 +18,21 @@ def test_extract_refs_example():
 def test_find_round_trip_example():
     graph = {"A": [("B", 100.0)], "B": [("A", 100.0)]}
     assert find_round_trip(graph, "A") == ["A", "B", "A"]
+
+
+def test_extract_refs_accepts_zero_digits():
+    assert extract_refs("INV-0000 INV-1020") == ["INV-0000", "INV-1020"]
+
+
+def test_extract_refs_rejects_more_than_four_digits():
+    assert extract_refs("INV-12345") == []
+
+
+def test_find_round_trip_backtracks_after_dead_end():
+    graph = {"A": [("B", 100.0), ("A", 100.0)]}
+    assert find_round_trip(graph, "A") == ["A", "A"]
+
+
+def test_find_round_trip_handles_cycle_not_involving_start():
+    graph = {"A": [("B", 100.0)], "B": [("B", 100.0)]}
+    assert find_round_trip(graph, "A") == []
